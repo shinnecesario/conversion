@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Number Systems Flashcard Quiz</title>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --accent: #2563eb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .app {
+      width: 100%;
+      max-width: 780px;
+      background: var(--card);
+      border-radius: 22px;
+      box-shadow: 0 18px 45px rgba(0,0,0,0.12);
+      padding: 28px;
+    }
+    h1 {
+      text-align: center;
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+    .subtitle {
+      text-align: center;
+      color: var(--muted);
+      margin-bottom: 22px;
+      line-height: 1.5;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      padding: 12px;
+      background: #f9fafb;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      font-weight: bold;
+    }
+    .flashcard {
+      border: 2px solid var(--border);
+      border-radius: 20px;
+      padding: 26px;
+      min-height: 290px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background: linear-gradient(180deg, #fff, #f9fafb);
+      margin-bottom: 18px;
+    }
+    .set-label {
+      font-size: 14px;
+      color: var(--accent);
+      font-weight: bold;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .question {
+      font-size: 26px;
+      line-height: 1.35;
+      font-weight: bold;
+      margin-bottom: 18px;
+    }
+    .points {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #1e40af;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      font-size: 18px;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      color: white;
+      background: var(--accent);
+    }
+    button.secondary {
+      background: #374151;
+    }
+    button:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+    .note {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 14px;
+      line-height: 1.5;
+      text-align: center;
+    }
+    .result {
+      display: none;
+      margin-top: 20px;
+      padding: 18px;
+      border-radius: 16px;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      text-align: center;
+    }
+    .result h2 {
+      margin-top: 0;
+    }
+    .answer-key {
+      margin-top: 14px;
+      display: grid;
+      gap: 10px;
+      text-align: left;
+    }
+    .key-item {
+      padding: 12px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      line-height: 1.45;
+    }
+    @media (max-width: 560px) {
+      .buttons {
+        grid-template-columns: 1fr;
+      }
+      .question {
+        font-size: 21px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <h1>Number Systems Flashcard Quiz</h1>
+    <div class="subtitle">
+      Answer one question at a time. Use <b>Previous</b> and <b>Next</b> to move through the flashcards.
+    </div>
+
+    <div class="topbar">
+      <div>Item: <span id="itemNumber">1</span> / 5</div>
+      <div>Total Items: 5</div>
+    </div>
+
+    <section class="flashcard">
+      <div class="set-label" id="category">Category</div>
+      <div class="question" id="question">Question appears here</div>
+      
+    </section>
+
+    <input type="text" id="studentAnswer" placeholder="Type your answer here." />
+
+    <div class="buttons">
+      <button class="secondary" id="prevBtn" onclick="previousCard()">Previous</button>
+      <button id="nextBtn" onclick="nextCard()">Next</button>
+    </div>
+
+    <div class="note">
+      Questions are randomized. Your score will appear after you finish.
+    </div>
+
+    <section class="result" id="result">
+      <h2>Quiz Completed</h2>
+      <p><b>Total Score:</b> <span id="finalScore"></span></p>
+      <button onclick="restartQuiz()">Restart / Randomize</button>
+      <div class="answer-key" id="answerKey"></div>
+    </section>
+  </main>
+
+  <script>
+    const questionBank = [
+      {category:"Binary to Decimal", q:"Convert 111₂ to decimal.", a:"111₂ = 7₁₀", difficulty:"Easy", points:2},
+      {category:"Binary to Decimal", q:"Convert 101₂ to decimal.", a:"101₂ = 5₁₀", difficulty:"Easy", points:2},
+      {category:"Binary to Decimal", q:"Convert 110₂ to decimal.", a:"110₂ = 6₁₀", difficulty:"Easy", points:2},
+      {category:"Binary to Decimal", q:"Convert 1001₂ to decimal.", a:"1001₂ = 9₁₀", difficulty:"Medium", points:3},
+      {category:"Binary to Decimal", q:"Convert 1011₂ to decimal.", a:"1011₂ = 11₁₀", difficulty:"Medium", points:3},
+
+      {category:"Decimal to Binary", q:"Convert 75₁₀ to binary.", a:"75₁₀ = 1001011₂", difficulty:"Difficult", points:5},
+      {category:"Decimal to Binary", q:"Convert 100₁₀ to binary.", a:"100₁₀ = 1100100₂", difficulty:"Difficult", points:5},
+      {category:"Decimal to Binary", q:"Convert 274₁₀ to binary.", a:"274₁₀ = 100010010₂", difficulty:"Expert", points:7},
+      {category:"Decimal to Binary", q:"Convert 49₁₀ to binary.", a:"49₁₀ = 110001₂", difficulty:"Difficult", points:5},
+      {category:"Decimal to Binary", q:"Convert 57₁₀ to binary.", a:"57₁₀ = 111001₂", difficulty:"Difficult", points:5},
+
+      {category:"Octal to Decimal", q:"Convert 32₈ to decimal.", a:"32₈ = 26₁₀", difficulty:"Easy", points:2},
+      {category:"Octal to Decimal", q:"Convert 110₈ to decimal.", a:"110₈ = 72₁₀", difficulty:"Medium", points:3},
+      {category:"Octal to Decimal", q:"Convert 25₈ to decimal.", a:"25₈ = 21₁₀", difficulty:"Easy", points:2},
+      {category:"Octal to Decimal", q:"Convert 47₈ to decimal.", a:"47₈ = 39₁₀", difficulty:"Medium", points:3},
+      {category:"Octal to Decimal", q:"Convert 76₈ to decimal.", a:"76₈ = 62₁₀", difficulty:"Medium", points:3},
+
+      {category:"Hexadecimal to Decimal", q:"Convert 110₁₆ to decimal.", a:"110₁₆ = 272₁₀", difficulty:"Difficult", points:5},
+      {category:"Hexadecimal to Decimal", q:"Convert 1A₁₆ to decimal.", a:"1A₁₆ = 26₁₀", difficulty:"Medium", points:3},
+      {category:"Hexadecimal to Decimal", q:"Convert A7₁₆ to decimal.", a:"A7₁₆ = 167₁₀", difficulty:"Difficult", points:5},
+      {category:"Hexadecimal to Decimal", q:"Convert 2F₁₆ to decimal.", a:"2F₁₆ = 47₁₀", difficulty:"Medium", points:3},
+      {category:"Hexadecimal to Decimal", q:"Convert FF₁₆ to decimal.", a:"FF₁₆ = 255₁₀", difficulty:"Difficult", points:5},
+
+      {category:"Binary to Octal", q:"Convert 101011₂ to octal.", a:"101011₂ = 53₈", difficulty:"Difficult", points:5},
+      {category:"Binary to Hexadecimal", q:"Convert 11010111₂ to hexadecimal.", a:"11010111₂ = D7₁₆", difficulty:"Expert", points:7},
+      {category:"Hexadecimal to Binary", q:"Convert D7₁₆ to binary.", a:"D7₁₆ = 11010111₂", difficulty:"Difficult", points:5},
+      {category:"Octal to Binary", q:"Convert 53₈ to binary.", a:"53₈ = 101011₂", difficulty:"Difficult", points:5}
+    ];
+
+    let questions = [];
+    let current = 0;
+    let answers = [];
+
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function restartQuiz() {
+      questions = shuffle(questionBank).slice(0, 5).map(item => ({...item, points: 7}));
+      current = 0;
+      answers = new Array(5).fill("");
+      document.getElementById("result").style.display = "none";
+      document.getElementById("studentAnswer").style.display = "block";
+      document.querySelector(".flashcard").style.display = "flex";
+      document.querySelector(".buttons").style.display = "grid";
+      loadCard();
+      updateTotals();
+    }
+
+    function loadCard() {
+      const item = questions[current];
+
+      document.getElementById("itemNumber").textContent = current + 1;
+      document.getElementById("category").textContent = item.category;
+      document.getElementById("question").textContent = item.q;
+      
+      document.getElementById("studentAnswer").value = answers[current] || "";
+
+      document.getElementById("prevBtn").disabled = current === 0;
+      document.getElementById("nextBtn").textContent = current === questions.length - 1 ? "Finish" : "Next";
+      
+    }
+
+    function saveAnswer() {
+      answers[current] = document.getElementById("studentAnswer").value.trim();
+    }
+
+    function previousCard() {
+      saveAnswer();
+      if (current > 0) {
+        current--;
+        loadCard();
+      }
+    }
+
+    function nextCard() {
+      saveAnswer();
+      if (current < questions.length - 1) {
+        current++;
+        loadCard();
+      } else {
+        finishQuiz();
+      }
+    }
+
+    function normalize(text) {
+      return text
+        .toLowerCase()
+        .replace(/\s/g, "")
+        .replace(/₀/g,"0").replace(/₁/g,"1").replace(/₂/g,"2").replace(/₃/g,"3").replace(/₄/g,"4")
+        .replace(/₅/g,"5").replace(/₆/g,"6").replace(/₇/g,"7").replace(/₈/g,"8").replace(/₉/g,"9");
+    }
+
+    function expectedCore(answer) {
+      return answer.split("=")[1].trim();
+    }
+
+    function removeBaseNotation(text) {
+      return text
+        .replace(/[₀₁₂₃₄₅₆₇₈₉]+/g, "")
+        .replace(/_[0-9]+/g, "")
+        .replace(/base[0-9]+/gi, "");
+    }
+
+    function isCorrect(student, correct) {
+      const s = normalize(student);
+      const cFull = normalize(correct);
+      const cCore = normalize(expectedCore(correct));
+      const cCoreNoBase = normalize(removeBaseNotation(expectedCore(correct)));
+
+      return (
+        s === cFull ||
+        s === cCore ||
+        s === cCoreNoBase ||
+        s.includes(cCore) ||
+        s.includes(cCoreNoBase)
+      );
+    }
+
+    function getCurrentPoints() {
+      let total = 0;
+      for (let i = 0; i < questions.length; i++) {
+        if (answers[i] && isCorrect(answers[i], questions[i].a)) {
+          total += questions[i].points;
+        }
+      }
+      return total;
+    }
+
+    function getPossiblePoints() {
+      return questions.reduce((sum, item) => sum + item.points, 0);
+    }
+
+    function updateTotals() {
+      /* Total possible points is fixed at 35. */
+    }
+
+    function finishQuiz() {
+      const total = getCurrentPoints();
+      const possible = getPossiblePoints();
+
+      document.getElementById("finalScore").textContent = total + " points";
+      /* Final possible points fixed at 35. */
+
+      const key = document.getElementById("answerKey");
+      key.innerHTML = "";
+
+      questions.forEach((item, index) => {
+        const student = answers[index] || "No answer";
+        const correct = isCorrect(student, item.a);
+
+        const div = document.createElement("div");
+        div.className = "key-item";
+        div.innerHTML = `
+          <b>Item ${index + 1}: ${item.category}</b><br>
+          Question: ${item.q}<br>
+          Your Answer: ${student}<br>
+          Correct Answer: <b>${item.a}</b>
+        `;
+        key.appendChild(div);
+      });
+
+      document.getElementById("result").style.display = "block";
+      document.getElementById("studentAnswer").style.display = "none";
+      document.querySelector(".flashcard").style.display = "none";
+      document.querySelector(".buttons").style.display = "none";
+    }
+
+    restartQuiz();
+  </script>
+</body>
+</html>
